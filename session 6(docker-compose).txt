@@ -1,0 +1,79 @@
+
+drive
+-----
+
+
+
+Installation of docker compose
+===============================
+1.open 'https://docs.docker.com/compose/install/'
+	->click on the linux section copy the commands pased in docker host
+sudo curl -L "https://github.com/docker/compose/releases/download/1.26.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+2.giving execute permission
+	https://docs.docker.com/compose/install/
+4.To check the docker-compose version
+        docker-compose --version
+----------------------
+
+The name of the file docker-compose.yaml or docker-compose.yml
+
+version--->version of the docker-compose
+
+create a docker compose for creating dev envinorment where word pree container is linked with mysql container
+
+$vi docker-compose.yaml
+---
+version: '3'
+services:
+ mydb:
+  images: mysql:5
+  envinorment:
+   MYSQL_ROOT_PASSWORD: vishnu
+ mysite:
+  image: wordpress
+  ports:
+   - 8080:80
+  links:
+   - mydb:mysql
+...   
+To  start the services from the above docker-compose file the command is 
+$docker-compose up -d 
+   -d represent detach mode 
+
+To stop the services 
+  docker-compose stop
+
+	========================================== 
+Jenkins container linked with two tomcat container 
+
+$vi docker-compose.yaml
+
+---             
+version: '3'    
+services:      
+ dev:                   
+  image: jenkins              
+  ports:                      
+   - 8080:8080                
+               
+ qaserver:                        
+  image: tomcat               
+  ports:
+   - 8081:8080  
+  links:        
+   - "myjenkins: jenkinsalias"
+ prodserver:                      
+  image: tomcat               
+  ports:                      
+   - 8082:8080 
+  links:                      
+   - "myjenkins: jenkins"     
+...                                 
+
+
+
+
+
+
+

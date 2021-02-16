@@ -1,0 +1,115 @@
+DOCKER VOLUMES
+==============
+containers are epembral that is these are created for specific purpose and deleted once it is done but that data 
+processed by a container should be persistant that is we should be able to acess the data even after the container is deleted.
+This can be done using docker volumes 
+
+A volume is an external directory or device and that is mounted on a container and files that are crated in this mounted volume 
+will remain even after container is deleted.
+
+
+volumes can be implemented in multiple ways  
+	1.simple docker volumes
+	2.sharable volumes
+	3.docker volume containers
+simple docker volunes:
+======================
+	create a directory in host machine "/data"
+	create a centos container and mount /data as volume on it  
+	create some files in this mounted volume delete the container and check is these files are still available
+
+
+
+1.$mkdir /data
+2.docker run --name myubuntu -it -v /data centos
+3.$cd data
+4.touch m1 m2 m3
+4.exit 
+5.docker inspect c1
+go to mount section and copy the source path
+6.docker rm -f  myubuntu
+7.cd "source_path_from_sep_5"
+
+
+sharable volumes:
+============== 
+create /data as a directory on the host machine
+create a centos containe c1 and mount '/data' as a volume on this container .
+create another 2 centos containers c2 and c3 
+	c2 is should used by c1
+	c3 is sholud used by c2
+1.create /data folder
+	mkdir /data
+2.start centos as a container and mount /data as a volume 
+	 docker run --name -it -v /data centos
+3.in the centos c1 container go into the volume and create file
+	cd data
+	touch f1 f2
+	come out of the container without exit 
+4.create another centos container c2 and this container should use the valume used by c1
+	docker run --name c2 -it --volumes-from c1 centos
+5.in the centos c2 container go into the volume and create files
+	cd data
+	touch f3 f4
+	come out of the container without exit 
+6.create another centos container c3 and this container should use the volume used by c2
+	docker run --name c3 -it --volumes-from c2 centos
+7.in the centos c3 container go into the volume and create files
+cd data
+touch f5 f6
+8.go to any other container see all the files c1 or c2 or c3
+ls
+exit
+9.identify the mounted location
+	docker inspect c1
+go to mount section and copy the source path
+
+
+10.delete all the containers 
+	docker rm -f c1 c2 c3
+11.check if the files are still available on the host machine
+	cd "source of copied mount location"
+	ls
+
+
+
+Drawbacks of these two containers:
+we cant pass the data which present in host machine to containers 
+ie bi directional is not possible ,
+so thats why we have to use docker volume containers
+
+docker volume containers :
+------------------------
+these volumes are used to share data between multiple containers
+we can also be used passing data initally to container
+
+	create a volume called myvolume and create a tomcat-users.xm in this volume 
+	and mount this volume on a tomcat container into the tmp folder of the tomcat
+ 
+1.create a docker volume 
+	docker volume create myvolume
+2.check where the docker volume is created
+	docker inspect volume myvolu
+3.copy where the volume is created and move to that folder
+	cd "move to that folder"
+4.create tomcat-users.xml
+vim tomcat-users.xml
+
+<tomcat-users>
+	<user username="intelliqit" password="intelliqit" roles=manager-script/>
+</tomcat-users>
+
+5.create a tomcat container and mount the above volume on it
+	docker run --name mytomcat -it -d -v myvolume:/tmp/tomcat
+6.go into the shell of the tomcat container
+	docker exec -it t1 bash
+7.go into /tmp folder and check the tomcat-users.xm file
+	cd /tmp
+	ls
+
+
+
+
+
+
+

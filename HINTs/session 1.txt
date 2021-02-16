@@ -1,0 +1,22 @@
+virtualization
+	-FIXED AMOUNT OF HARDWARE RESOURCE
+	-If yo want to increases the resources,First we have to do shutdown and modify the resources file
+containarization
+	- MEMORY
+		-Run time allocation
+	-PROCESS ISOLATION
+	- BUILD SHIP RUN
+Docker comes in two flavours
+	- community edition           :----->Free
+	- enterprise Edition          :------>Money,docker community will support us
+					      Installed only in Red Hat
+
+
+INSTALLING DOCKER: 
+		https://get.docker.com/
+                     -  $ curl -fsSL https://get.docker.com -o get-docker.sh  --------> This command will download the shell script file
+		     -  $ sh get-docker.sh                                    --------> This command will execute the script
+
+To check docker version is installed or not
+    $ docker --version	 
+    

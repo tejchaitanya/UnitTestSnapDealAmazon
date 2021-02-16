@@ -1,0 +1,195 @@
+Docker containers communicate with each other using following networks
+1.bridge
+2.host
+3.null
+4.overlay
+
+BRIDGE network:This the default network that is used when multiple docker containers are running on the same host machine.
+-----------
+HOST network :This is used when we want the docker container to communicate only with the host machine and not with the 
+------------
+          other containers
+NULL :this is used when we want to create isolated containers which cannot communicate with other containers or with the host machine
+------
+OVERLAY :This network is used when docker containers are running in distributed envinorment on multiple servers and they have to communicate with
+--------
+	each other 
+
+
+
+Create two BRIDGE networks intelliq1 and intelliq2 
+create three busy box containers c1 ,c2,c3
+c1 and c2 should run on intelliq1 network and c3 run on intelliq2 network
+initially c1 and c2 should ping each other but they sholud not ping to c3
+later add c2 container to intelliq2 network
+because c2 is present on both the networks it should able to ping c2 and c3
+but c1 and c3 containers sholud not ping each other 
+
+
+create 2 bridge networks
+	docker network create --driver bridge intelliq1
+	docker network create --driver bridge intelliq2
+check the list of available networks
+	docker network ls
+create a busy box container c1 on intelliq1 network
+	docker run --name c1 -it --network intelliq1 busybox
+	come out of the c1 container without exit ctrl +p,ctrl +q
+identify the ip address of c1
+	docker inspect c1
+
+create another busy box container c2 on intelliq1 network 
+	docker run --name c2 -it --network intelliq1 busybox	
+
+	ping IP_ADDRESS_C1 (it will ping)
+	come out of c2 container without exit ctrl+p,ctrl+q
+identify the ip address of c2
+	docker inspect c2
+create another busy box container c3  on intelliq2 network
+	ping IP_ADDRESS_C1 (it will not ping)
+	ping IP_ADDRESS_C2 (it will not ping)
+
+	come out of c3 container without exit ctrp+p,ctrl+q
+
+identify the ip address of c3 
+	docker inspect c3
+now attach intelliq2 network to c2 container 
+	docker network connect intelliq2 c2
+
+since c2 is now on both intelliq1 and intelliq2 network it should ping 
+to both c1 and c3 containers
+	docker attach c2	
+	ping ip_address_of_c1(it will ping)
+	ping ip_address_of_c2(it will ping)
+
+but c1 and c3 should not ping each other 
+	docker attach c3
+	ping Ip_address_of_c1(it should not ping)
+
+
+
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++===
+
+UPLOADING images into docker registry
+=====================================
+
+docker registry is of two types
+	1.public 
+	2.private
+
+public:	hub.docker.com
+	and images uploaded into public registry can be accessed globally by everyone
+private:it is maintained within our organisation servers and only our team members can access it 
+
+
+uploading images into public registry
+------------------------------------	
+	create a customized centos image and uloaded into hub.docker.com
+
+1.open hub.docker.com----->signup for free account
+
+2.create a customized centos images where git is intslled 
+	a)docker run --name c1 -it centos
+	b)yum install -y git 
+	c)exit
+	d)docker commit c1 vishnukrishna1999/centos
+
+			note :->vishnukrishna222 is docker_id
+
+3.login into docker hub
+	docker login
+	   enter username
+           enter password
+
+4.push the customized docker image
+	docker push vishnukrishna222/centos
+
+
+
+
+----------------------------------------------------------------
+working on local registry
+\\\\\\\\\\\\\\\\\\\\\\\\\\
+	local registry can be created using docker image known as registry ,if the registry is started as a container
+it will start like a docker local registry
+
+create a docker local registry and upload an alpine into this registry
+
+
+1.start registry image as a container 
+	docker run --name lr -d -p 5000:5000 registry
+2.download an alpine image from docker hub
+	docker pull alpine
+3.tag (link) the alpine image with local registry 
+	docker tag alpine localhost:5050/alpine
+4.push the tagged image into local registry
+	docker push localhost:5000/alpine 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+172.19.0.2
+172.20.0.3
+172.20.0.2
+
+
+
+
+
+
+
+
+
+
+
+ 

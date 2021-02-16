@@ -1,0 +1,298 @@
+
+creating customized docker images
+=================================
+	we can create docker customized images in two ways 
+		
+		1.docker commit 
+
+		2.dockerfile
+
+using docker commit :
+---------------------
+create an ubuntu container and install git in it.
+save this container as docker images .
+create a container from this new image and we should git pre-installed in it .
+
+
+
+ 1.start ubuntu as a container
+	docker run --name myubuntu -it ubuntu
+ 2.in this ubuntu container install git 
+	apt-get update
+	apt-get install -y git
+   	exit
+ 3.save this container as an image 
+	docker commit myubuntu ubuntuimage
+ 4.check if new docker image is created or not 
+	docker images 
+ 5.craete a new image from the newly created image
+	docker run --name newimg -it ubuntuimage
+ 6.check the git version.
+	git --version
+
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+using docker file :
+-------------------
+
+dockerfile is a text based file which can be used for creating customized docker images
+
+important keywords used in dockerfil
+************************************
+	FROM:this is used to specify the base image (starting image) using which we want to start the customization
+	-----
+
+	MAINTAINER:this is used to represent the name of the author or the organisation that has created this docker file 
+	------------
+
+	CMD:  this is used to run a command or process in a container from outside of the container 
+	----
+	
+	ENTRYPOINT: every docker container triggers a "default process" and that container will be in runnig  condition as long as the 
+	----------
+	   	   process run using entry point we can define this default process
+
+	COPY: this is used for copying files from host to container
+	----
+
+
+	ADD:this is also used to copying files from host machine to container 
+		it can also be used from downloading from a remote server into a container
+
+
+	USER:used for specifying the default used who should login into the container
+
+	ENV:used for specifying which variables shold be passed 
+
+
+
+	EXPOSE:this is used to specify what port should be opened in the container
+
+	VOLUME:this is useful in spying what shold be the default volume of the container
+	
+	WORKDIR:this is used to specify the working directory of the container
+ 	
+	LABEL:used for giving a default name for the container
+	
+	RUN:this used for executing commands related to installation of softwares with in docker image 
+
+
+
+======================
+create a docker file with base image ngnix and maintainer as intelliq
+
+
+
+1.vi dockefile 
+   
+	FROM ngnix
+	MAINTAINER intelliq
+2 docker build -t myngnix .
+
+       myngnix means new image name 
+       . represent current working directory
+3.check if image is present or not 
+	docker images 
+
+=====================================
+create a docker  from centos base image and give 'ls -la' as command that should be executed 
+
+CMD["ls","-la"]
+
+	create an docker image
+		docker build -t mycentos .
+	create a container from the above image 
+		docker run --name ce -it mycentos
+
+NOTE:in a docker file we can use only one cmd instruction
+if we have multiple cmd only last one will be executed
+
+=================================================
+create a docker file from ubuntu base image and install git on it
+
+vi dockerfile 
+	FROM ubuntu
+	MAINTAINER vishnu 
+	RUN apt-get update
+	RUN apt-get -y git
+create an image 
+	docker build -t ubugit .
+creat a container based on ubugit image
+	docker run --name ubuntugit -it ubugit
+check the version of git 
+	git --version
+======================================================
+create a dockerfile from ubuntu base image and install ansible in it 
+
+
+
+vi dockerfile 
+
+	FROM ubuntu
+	MAINTAINER vishnu 
+	RUN apt-get update 
+	run apt-get install -y software-properties-common
+	run apt-add-repository ppa:ansible/ansible
+	run apt-get update 
+	run apt-get install -y ansible
+
+create an image from docker file
+ 	docker build -t ansible .
+create a container from the above image 
+	docker run --name myans -it ansible
+check the ansible version
+	 ansible --version
+
+====================================================
+cache busting
+--------------
+	when ever we create an image from a docker file ,docker stores all thaose instruction in its memory which is called 
+docker cache
+
+Next time when we have the docker file it executes only the new instructions and old instructions it will read from the cache 
+This is the time saving mechanism of docker 
+ex:
+
+RUN apt-get update
+RUN apt-get install -y git
+
+and if you build an image from thius docker file it will store all the instructions in the docker cache
+if we add 
+
+RUN apt-get install -y maven
+it will execute the only latest instruction and remaining from memory the result is we might end up installing packages from apt-repository
+which updated long time back we can overcome this problem using cache busting by implementing the "&&"
+where ever this '&&' symbol that instruction will be executed one more time without reading from the cache 
+RUN apt-get update && apt-get install -y git maven
+===============================================================
+
+USERS
+==========
+FROM jenkins
+MAINTAINER vishnu
+
+note :-> install maven we cant do that 
+because present user is jenkins{whoami)
+
+
+----------------------------
+FROM jenkins
+MAINTAINER vishnu
+USER root
+
+now we can intall maven
+=====================================
+installing jenkins by using ADD command 
+
+
+FROM ubuntu
+MAINTAINER vishnu
+ADD http://mirrors.jenkins.io/war-stable/latest/jenkins.war /tmp
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ENTRYPOINT
+=============
+create a docker file on ubuntu base image and install java in it 
+download jenkins.war and make execution of java -jar jenkins.war as the default process of the container
+  
+
+
+FROM ubuntu
+RUN apt-get install 
+RUN apt-get update 
+RUN apt-get install -y openjdk-8-jdk
+ADD http://mirrors.jenkins.io/war-stable/latest/jenkins.war /tmp
+ENTRYPOINT ["java","-jar","jenkins.war"]
+
+
+Build docker image 
+
+docker build -t myjenkins .
+
+
+create a container
+
+docker run -it my jenkins
+we should see the logs of "java -jar jenkins.war" on the screen
+
+docker container ls
+
+ we will see in the "command" the default command is executed is "java -jar jenkins.war"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	 

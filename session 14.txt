@@ -1,0 +1,46 @@
+Docker stack
+============
+
+
+Jenkins Envinorment with Docker stack
+====================================
+$vi stack.yaml
+---
+version: '3'
+services:
+ dev:
+  image: jenkins
+  ports:
+   - 8525:8080
+  deploy:
+   replicas: 2
+   placement:
+    constraints:
+     - node.hostname == node1
+ qa:
+  image: tomcat8
+  ports:
+   - 8087:8080
+  deploy:
+   replicas: 3
+   placement:
+    constraints:
+     - node.hostname == node2
+ prod:
+  image: tomcat8
+  ports:
+   - 8526:8080
+  deploy:
+   replicas: 6 
+   placement:
+    constraints:
+     - node.hostname == node2
+
+...
+
+
+
+
+
+
+$docker stack deploy -c stack.yaml ci-cd

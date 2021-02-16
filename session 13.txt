@@ -1,0 +1,209 @@
+Fail over scenario in Docker:
+-------------------------
+start httpd with 6 replicas delete one replica running on  the manager check if all 6 replicas are still running
+drain worker one from swarm and check if the replicas running on worker 1 have migrated to manager and worker 2
+make worker 1 rejoined swarm  
+make worker 2 leave the docker swarm and check if the replicas running on worker 2 have migrated to manager and worker 1
+
+1.create http with 6 replicas
+	docker service create --name webserver -p 8080:80 --replicas 6 httpd
+2.check if six replicas are running 
+        docker service ps webserver
+3.delete a replica running on manager
+        docker rm -f container_id_OF_manager
+4.check is all six replicas are still running
+  	docker service ps webserver
+5.drain worker 1 from the swarm
+   	docker node update --availability drain worker1
+6.check is all six replicas are still running on manager and worker 2
+  	docker service ps webserver
+7.Make worker1 rejoin the swarm 
+ 	docker node update --availability active worker1
+8.maker worker 2 leave the swarm 
+	connect worker2 Ec2 instance 
+   	docker swarm leave 
+9.check is all six replicas are still running on manager and worker1
+  	docker service ps webserver
+
+
+=========================================================
+
+Generating token id for worker to join swarm
+	docker swarm join-token worker
+
+Generating tokenid for master to join swarm
+	docker swarm join-token manager
+ 
+
+Note: In docker swarm we can have multiple manager and workers
+if manager collapses the another manager will become leader
+
+
+
+3.to promote a machine worker1 as manager 
+   docker node promote worker1 
+4.to promote a machine called "worker1" from  manager back to worker 
+   docker node demote worker1
+
+
+ 
+============================================================
+
+
+Docker swarm networking
+-----------------------
+	docker swarm by default uses overlay network also known as Ingress network all the services 
+created in docker swarm will be running on this default overlay network 
+you can create our own virtual overlay networks and make services run on these networks
+
+
+Ex:create two overlay networks intelli1 and intelliq2
+start tomcat with 6 replicas on intelliq 1 network
+start httpd with 6 replicas on default ingress network and later migrate it to intelliq2 network
+
+
+1.create 2 overlay networks 	
+	docker network create --driver overlay intelliq1
+	docker network create --driver overlay intelliq1
+2.To see list of the networks
+ 	docker network ls
+3.start tomcat with 6 replicas on intelliq1 network
+	docker service create --name appserver -p 9090:8080 --replicas 6 --network intelliq1 tomcat
+4.to check tomcat is running on intelliq network
+	docker service inspect appserver --pretty
+5.start https with 6 replicas on the default overlay(ingress) network
+        docker service create --name webserver -p 8080:80 --replicas 6 https
+6.perform a rolling network update and migrate to intelliq2 network
+  	docker service update --network-add intelliq2 webserver
+7.check if httpd is running on intelliq network
+	docker service inspect webserver --pretty
+===================================================================================
+
+when we wont give replica count it will create the container in manager or worker 1 or worker 2
+we can access from manager or workers(replica is created in manager we can access in workers also)
+
+
+
+$docker service create --name nginx -p 8080:80 nginx
+
+=====================================================================================================
+
+Docker stack:
+-------------
+
+Implementing docker-compose in swarm is called as docker stack
+
+docker-compose + swarm=docker stack
+docker-compose + kubernetes =kompose
+
+
+A docker statck is group of inter related services that shared dependencies with each other in such a way that
+they can be scaled orchestrated togethere 
+A single stack is capable of defining the behaviour of entire application 
+
+
+1.to create a stack 
+ docker stack deploy -c docker_compose_file_name stack_name
+2.To see the list of stack available
+ docker stack ls
+3.To see info about a stack
+ docker stack ps stack _name
+4.to delete a stack 
+  docker stack rm stack_name
+
+
+$vi stack1.yaml
+---
+version: '3'
+services:
+ word:
+  image: wordpress
+  ports:
+   - 8080:80
+  deploy:
+   replicas:3
+
+ mydb:
+  image: mysql:5
+  environment:
+   MYSQL_ROOT_PASSWORD:vishnu
+...
+
+
+
+To deploy this services into swarm 
+ docker stack deploy -c stack1.yaml wordpress
+To see where this services are running 
+docker stack ps wordpress
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

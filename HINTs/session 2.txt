@@ -1,0 +1,12 @@
+Images:
+   A docker image is a combination of bin and lib that are necessary for a software application to run
+   Most of the docker images are available in Docker Hub
+   Docker hub is nothing but an registry which is maintained by a docker community
+
+Containers:
+  A running image is nothing but an container
+  by using one image we can run multiple containers 
+
+
+
+       DOCKER ARCHITECTURE: refer docker-1 img

@@ -1,0 +1,88 @@
+linking containers :to develop multi container architecture
+-------------------
+
+--link          =============>depricated way
+docker-compose
+python scripts
+docker networking
+
+
+--link  :
+=========
+1.Create a busybox container 
+	docker run --name c1 -it busybox
+  comeout of the container without terminate (ctrl p and cntrlq)then container will go to background
+2.create a anothe busybox container and link with c2 by using '--link option'
+        docker run --name c2 -it --link c1:c1alias busybox
+        ping c1(it will ping)
+
+
+	=============================================================
+creating wordpress container which is linked with mysql container
+
+1. creating wordpress container 
+    docker run --name myword -d -p 8080:80 worpress
+2.creating my container which is liked with worpress
+    docker run --name mysql -d -e MYSQL_ROOT_PASSWORD=vishnu --link myword:mywordalias mysql:5
+
+
+	=====================================================
+
+creating dev server,QA server,prod server 
+
+1.creating dev server
+    docker run --name devserver -d -p 8080:8080 jenkins
+2.creating QA server which is linked with dev server
+    docker run --name qaserver -d -p 8081:8080 --link devserver:devserveralias tomcat
+
+3.creating production server which is linked with jenkins
+    docker run --name prodserver -d -p 8082:8080 --link devserver:devalias  tomcat 
+
+
+Note: we can check the container is linked or not 
+	docker inspect devserver 
+   the output will be shown in Json format 
+   go to links option
+
+	====================================================
+
+Creating master slave architecture
+
+1.creating jenkins container 
+ docker run --name master -d -p 8080:8080 jenkins
+
+2.docker run --name slave -it --link master:masalias ubuntu
+   wget master:8080/jnlpJars/slave.jar
+
+
+	================================================
+LAMP architecture
+  L--->linux
+  A---->apache
+  M----->Mysql
+  P------php
+
+
+
+docker run --name mydb -d -e MYSQL_ROOT_PASSWORD=vishnu mysql
+docker run --name mytomcat -d -p 8080:8080 --link mydb:mydbalias mysql
+docker run --name myphp -d  --link mydb:mydbalias --link mytomcat:myalias php:7.2-apache
+	==========================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

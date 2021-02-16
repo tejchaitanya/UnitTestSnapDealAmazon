@@ -1,0 +1,166 @@
+
+ CONTAINER ORCHESTRATION
+----------------------------
+	this is the process of running multiple docker containers in a distributed envinorment on multiple servers 
+all these containers should be scaled,updated orchestrated togethere 
+
+Advantages
+----------- 
+1)load balancing :we can run multiple replicas of the same the same container on multiple hosts and does distribute the 
+load between these replicas 
+2)scaling :when the bussiness expands we should be able to increase the replicas and it goed down we should able decrease the count 
+of replicas with out experiencing any down time .
+3)Rolling Updates:the services running in a production envinorment should be upgraded or downgraded to diff versions with out the end
+users experiencing the downtime 
+this is done by effection one replica after another 
+
+4)high availability and disaster recovery :if the replicas running in a production envinorment go down (or)the servers where this 
+replicas are running go down still the end user should able to access the application
+this is done by maintaining what is known as "desired state "
+if replicas count goes  below the desired state the container orchestration tool will create more replicas on existing servers 
+to reach desired state 
+
+
+popular container orchestration tools
+
+1.docker swarm
+2.kubernetes
+3.open shif 
+4.apache mesos
+
+
+docker swarm :
+------------
+  set up part
+	
+
+1.create 3 aws ubuntu instances 
+
+2.install docker on all of them 
+3.change the hostname(optional)
+	$vim /etc/etc/hostname
+	remove content of this file and replace with it 
+	manager,worker-1,worker-2
+4.connect to the manager aws instance and create the swarm 
+	docker swarm int --advertise-addrePRIVATE_IP_MANAGER
+	the above command will convert the current aws instance into a manager 
+	and it will also generate a "token_id"for joining workers into the cluster 
+	copy the token_id and paste it in worker-1 and worker-2
+
+
+
+To see all managers and workers 
+ docker node ls	
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+LOAD BALANCING:
+-------------- 
+
+1.create nginx with 5 replicas in the swarm cluster 
+	docker service create --nameweb server -p 8080:80 --replicas 5 nginx
+
+2.to check if 5 replicas are running
+	docker service ps webserver 
+
+3.to access the home page of the replicas 
+	launch any browser
+	public_ip_dockerhost:8080
+ 
+-----------------------------------------
+
+1.create mysql:5 with 3 replicas in the swarm cluster 
+	docker service create --name mydb --replicas 3 -e MYSQL_ROOT_PASSWORD=vishnu mysql:5
+2.To check if 3 replicas are running 
+	docker service ps mydb
++++++++++++++++++++++++++++++++++++++++++++++++++++++
+scaling:
+-------
+	depending on bussiness req we can should able to either increase or decrease the replica count
+
+1.create tomcat with 4 replicas in docker swam and scale it up to 8
+	docker service create --name appserver --replicas 4 -p 9090:8080 tomcat
+	
+2.To check if 4 replicas are running 
+	docker service ps appserver
+3.Increase the count of replicas to 8
+	docker service scale appserver=8
+
+
+
+lly if you want decrease the size of replicas 
+   docker service scale=3
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ROLLING UPDATES:
+----------------
+
+start redis3 with 6 replicas in docker swarm and then perform a rolling update to redis4 again perform 
+a rolling rollback to redis3
+
+
+1.start redis:3 with 6 replicas
+	docker service create --name myredis --replicas 6 redis:3
+
+2.check if 6 replicas of redis :3 are running
+	docker service ps myredis
+3.performing a rolling update to redis:4
+	docker service update --image redis:4 myredis
+
+                 "from the above stmt 4 represent version of redis
+4.check if redis:3 are stopped and reddis4 are running
+	docker service ps myredis | grep Running
+5.roll back to redis:3 version
+  docker service rollback myredis
+6.check if redis:4 replicas stopped and reddis3 are running
+	docker service ps myredis 
+
+
+
+
+
+ 
+
+
+
+
+
+===================================================================================================================
+
+1.To see the list of services running in swarm
+    docker service ls
+2. to remove the services in docker swarm
+    docker service rm service_name/service_id
+3.To get detailed info about the services in swarm
+    docker service inspect service_name/service_id
+    This command shows output in Json file
+    To see this output in normal plain format
+	docker service inspect service_name/service_id --pretty
+
+4.To drain (remove) we worker from swarm
+   docker node update --availability drain worker_name
+
+5.To make a drained worker rejoin the swarm
+   docker node update --availability active worker_name
+6.for a worker to leave the swarm 
+   connect to worker machine 
+   docker swarm leave
+
+7.for the manager to leave the swarm 
+    connect to manager 
+    docker swarm leave --force 
+8.To see the list of nodes in swarm 
+
+  docker node ls
+
+9.to get detailed info about node 
+   docker node inspect node_id/node_name
+10.to remove a delete  from the node list
+   docker node rm node_name
+
+
+
+
+
+
+

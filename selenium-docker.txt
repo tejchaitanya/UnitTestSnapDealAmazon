@@ -1,0 +1,3 @@
+docker commands are executed in windows by using poweshell
+	$docker version
+creating selenium grid set up

@@ -1,0 +1,141 @@
+Working on docker images
+===========================
+1 To pull an image
+  docker pull image_name
+
+2 To push an image into docker hub
+  docker push image_name
+
+3 To search for an image
+  docker search image_name
+
+4 To delete an image frim the dockerhost
+  docker rmi image_name/image_id
+
+5 To create an image using a container
+  docker commit container_name/container_id new_image_name
+
+6 To create images from dockerfile
+  docker build -t new_image_name .
+
+7 To see the list of all the images present in the dockerhost
+  docker images
+  or
+  docker image ls
+
+9 To delete all the unused images
+  docker system prune -a
+
+10 To link an image with a localregistry(tag)
+   docker tag image_name  localregistry/image_name
+
+   docker images | grep localregistry
+
+
+Working on docker containers
+=================================
+11 To see the list of all the runnig containers
+   docker container ls
+
+12 To see the list of all containers (running and stopped)
+   docker ps -a
+
+13 To start a stopped container
+   docker start container_name/container_id
+
+14 To stop a running container
+   docker stop container_name/container_id
+
+15 To restart a container
+   docker restart container_name/container_id
+   To restart a container after 20 seconds
+   docker restart -t 20 container_name/container_id
+
+16 To get detailed info about a container
+   docker inspect container_name/container_id
+
+17 To see the ports that are opened on the container
+   docker port container_name/container_id
+
+18 To see the logs genrated by the container
+   docker logs container_name/container_id
+
+19 To delete a stopped container
+   docker rm container_name/container_id
+
+20 To delete a running container
+   docker rm -f container_name/container_id
+
+21 To stop all the running container
+   docker stop $(docker ps -aq)
+
+22 To delete all stopped container
+   docker rm $(docker ps -aq)
+
+23 To delete all container(running and stopped)
+   docker rm -f $(docker ps -aq)
+
+24 To create a container
+   docker run image_name/image_id
+   --name    Used to assing a name for the container
+   -it       Used to open interactive terminal in the container
+   -d        Used to run the container in detached mode so that the logs of the
+             container dont come on the screen
+   -v        Used to mount volumes on the container 
+   --volumes-from   Used to share volumes between containers
+   -p     Used for port mapping
+          Eg : 8080:80   Here 8080 is the dockerhost port (external port) and 80 is the                container port(internal port)
+   -P    Used for automatic port mapping where the container port will be mapped
+          with some port no that is greate than 30000
+  --network   Used to attach a network to the container
+  --link      Used to link multiple containers to create a micro services architecture
+  -e      Used to pass environment variables to the container
+  --restart    Tries to do continuous restart if the container stops
+  -rm        Removes a container once we exit from it
+  --cpus    To put an upper limit on the count of cpus that the container can use
+  --memory   To put an upper limit on the amount of rem used by container
+
+25 To open termina in a contianer whcih has moved into background
+   docker attach container_name/container_id
+
+26 To run any other application or command in the container from outside
+   docker exec -it  container_name/container_id command
+   Eg To run bash process in aa container
+   docker exec -it container_name/container_id bash
+
+Docker Networking
+=======================
+25 To see the list of all the docker networks
+   docker network ls
+
+26 To create a network
+   docker network create --driver network_type  network-name
+
+27 To get detailed info about the network
+   docker network inspect network_name/network_id
+
+28 To connect a container to a docker network
+   docker network connect  network_name/network_id  container_name/container_id
+
+29 To disconnect a container from a network
+   docker network disconnect  network_name/network_id  container_name/container_id
+
+30 To delete  a network
+   docker netwrok rm network_name/network_id
+
+=================================================================================
+
+Working on docker volumes
+==========================
+31 To see the list of docker volumes
+   docker volume ls
+
+32 To create a volume
+   docker volume create volume_name
+
+33 To get complete info about a volume
+   docker volume inspect volume_name/volume_id
+
+34 To delete a volume
+   docker volume rm volume_name/volume_id
+

@@ -1,0 +1,124 @@
+
+drive
+-----
+
+
+
+Installation of docker compose
+===============================
+1.open 'https://docs.docker.com/compose/install/'
+	->click on the linux section copy the commands paste in docker host
+sudo curl -L "https://github.com/docker/compose/releases/download/1.26.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+2.giving execute permission
+	sudo chmod +x /usr/local/bin/docker-compose	
+4.To check the docker-compose version
+        docker-compose --version
+----------------------
+
+The name of the file docker-compose.yaml or docker-compose.yml
+
+version--->version of the docker-compose
+
+create a docker compose for creating dev envinorment where word pree container is linked with mysql container
+
+$vi docker-compose.yaml
+version: '3'
+services:
+ mydb:
+  image: mysql:5
+  environment:
+   MYSQL_ROOT_PASSWORD: vishnu
+ mysite:
+  image: wordpress
+  ports:
+   - 8080:80
+  links:
+   - "mydb:mydbalias"
+  links:To  start the services from the above docker-compose file the command is 
+$docker-compose up -d 
+   -d represent detach mode 
+
+To stop the services 
+  docker-compose stop
+
+	========================================== 
+Jenkins container linked with two tomcat container 
+
+$vi docker-compose.yaml
+
+---             
+version: '3'    
+services:      
+ dev:                   
+  image: jenkins              
+  ports:                      
+   - 8080:8080                
+               
+ qaserver:                        
+  image: tomcat               
+  ports:
+   - 8081:8080  
+  links:        
+   - "dev: jenkinsalias"
+ prodserver:                      
+  image: tomcat               
+  ports:                      
+   - 8082:8080 
+  links:                      
+   - "dev: jenkins"     
+...                                 
+
+
+	=====================================================
+Creating docker-compose.yaml using LAMP architecture
+
+$vi docker-compose.yaml
+---
+version: '3'
+services:
+ mydb:
+  images: mysql:5
+  environment:
+   MYSQL_ROOT_PASSWORD: vishnu
+ mytom:
+  image: tomcat
+  PORTS:
+   - 8080:8080
+  links: 
+   - "mydb:mydbalias" 
+ php: 
+  images: php:7.2-apache
+  links:
+   - "mydb: mydbalias"
+   - "mytom: mytomalias" 
+...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
